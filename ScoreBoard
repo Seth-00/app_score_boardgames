@@ -1,0 +1,415 @@
+import toga
+from toga.style import Pack
+from toga.style.pack import Pack, COLUMN, ROW, CENTER
+#from toga.constants import*
+import os
+user = {'':''}
+FILE_PATH = os.path.join(os.path.dirname(__file__), 'login_data.txt')
+
+
+def salvar_login(usuario, senha):
+    print("Tentando salvar os dados de login...") #log
+    try:
+        with open(FILE_PATH, 'w') as file:
+            file.write(f"{usuario.lower()}\n{senha.lower()}")  # Salva em minúsculas
+        print("Dados de login salvos com sucesso!") #log
+    except Exception as e:
+        print(f"Erro ao salvar os dados de login: {e}")  #log
+
+
+
+def ler_login():
+    print("Tentando ler os dados de login...")  # Log
+    try:
+        with open(FILE_PATH, 'r') as file:
+            usuario = file.readline().strip()
+            senha = file.readline().strip()
+            print(f"Login lido: {usuario}, Senha: {senha}")  # Log
+            return usuario, senha
+    except FileNotFoundError:
+        print("Arquivo de dados de login não encontrado.")  # Log
+        return None, None
+    except Exception as e:
+        print(f"Erro ao ler os dados de login: {e}")  # Log
+        return None, None
+
+
+class app(toga.App):  
+     
+        #menu inicial do app
+    def set_initial_view(self):
+        self.main_box = toga.Box(style=Pack(direction=COLUMN)) # background_color=BLACK mudar a cor de fundo
+
+        self.main_box.add(toga.Label('LOGIN', style=Pack(font_size=20)))
+
+        self.usuario = toga.TextInput(placeholder='acesso liberado, aperta entrar (momentâneo)')   #!!!!!!!!!!!!!!!!!!!!!!! trocar isso apos estiver pronto e colocar login
+
+        self.main_box.add(self.usuario)
+
+        self.senha = toga.PasswordInput(placeholder='Senha...')
+
+        self.main_box.add(self.senha)
+
+        self.main_box.add(toga.Button('Entrar', on_press=self.enviar))
+
+        self.main_box.add(toga.Label('Não Tem Login?', style=Pack(padding=(60, 0, 0, 150)))) #(cima, esquerda, baixo, direita)
+        self.main_box.add(toga.Button('Registrar-se', on_press=self.registrar))
+
+        
+        usuario, senha = ler_login()
+        if usuario and senha:
+            user[usuario] = senha  # Atualize o dicionário com os valores lidos
+            self.usuario.value = usuario
+            self.senha.value = senha
+        
+        
+        self.main_window.content = self.main_box
+
+#                    briefcase run android -d "@android" -u
+
+    def startup(self):
+        self.main_window = toga.MainWindow(title=self.formal_name)
+        self.set_initial_view()
+        self.main_window.show()
+
+
+        #função para voltar ao menu inicial do app
+    def voltar(self, widget):
+        self.set_initial_view()
+
+    
+    
+    def quantidade_player(self, widget):
+        self.players = toga.Box(style=Pack(direction=COLUMN, padding=(40, 0, 0, 20))) #(Cima, Esquerda, Baixo, Direita)
+
+        self.bnt_box = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 20))) #(Cima, Esquerda, Baixo, Direita)
+
+        self.bnt_box2 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 20))) #(Cima, Esquerda, Baixo, Direita)
+        
+        self.player1 = toga.Button('1 Jogador    ', on_press=self.wingspan_1player)
+
+        self.player2 = toga.Button('2 Jogadores', on_press=self.wingspan_2player)
+
+        self.player3 = toga.Button('3 Jogadores')
+
+        self.player4 = toga.Button('4 Jogadores')
+
+        self.player5 = toga.Button('5 Jogadores')
+
+        self.bnt_box.add(self.player1)
+        self.bnt_box.add(self.player2)
+        self.bnt_box.add(self.player3)
+        self.bnt_box2.add(self.player4)
+        self.bnt_box2.add(self.player5)
+
+
+        self.players.add(self.bnt_box)
+        self.players.add(self.bnt_box2)
+        self.players.add(self.bnt_box2)
+        self.players.add(toga.Button('Voltar', on_press=self.boardgames, style=Pack(padding=(0, 20, 0, 0)))) #(Cima, Esquerda, Baixo, Direita)
+
+        self.main_window.content = self.players
+
+
+
+    
+        #tela do contador de pontos do winsgpan
+    def wingspan_1player(self, widget):
+        self.wingspan_box = toga.Box(style=Pack(direction=COLUMN))
+    
+        self.wingspan_box.add(toga.Label('Numero de Penas', style=Pack(font_size=20)))
+        self.p1_ponto1 = toga.NumberInput()
+        self.wingspan_box.add(self.p1_ponto1)
+
+        self.wingspan_box.add(toga.Label('Pontos de Carta bônus ', style=Pack(font_size=20)))
+        self.p1_ponto2 = toga.NumberInput()
+        self.wingspan_box.add(self.p1_ponto2)
+
+        self.wingspan_box.add(toga.Label('Pontos de Fim de Turno ', style=Pack(font_size=20)))
+        self.p1_ponto3 = toga.NumberInput()
+        self.wingspan_box.add(self.p1_ponto3)
+        
+        self.wingspan_box.add(toga.Label('Número de Ovos ', style=Pack(font_size=20)))
+        self.p1_ponto4 = toga.NumberInput()
+        self.wingspan_box.add(self.p1_ponto4)
+
+        self.wingspan_box.add(toga.Label('Quantidade de Comida nas Cartas ', style=Pack(font_size=20)))
+        self.p1_ponto5 = toga.NumberInput()
+        self.wingspan_box.add(self.p1_ponto5)
+
+        self.wingspan_box.add(toga.Label('Cartas Debaixo de Passáros ', style=Pack(font_size=20)))
+        self.p1_ponto6 = toga.NumberInput()
+        self.wingspan_box.add(self.p1_ponto6)
+
+        self.p1_total_label = toga.Label('0', style=Pack(font_size=20))
+        self.wingspan_box.add(self.p1_total_label)
+        
+        self.wingspan_box.add(toga.Button('Somar', on_press=self.p1_somar))
+        self.wingspan_box.add(toga.Button('Voltar', on_press=self.quantidade_player))
+
+        self.main_window.content = self.wingspan_box
+
+
+
+    def wingspan_2player(self, widget):
+            
+         # tela /colunas /linhas do app
+        self.wingspan_box2 = toga.Box(style=Pack(direction=COLUMN)) 
+        self.wingspan_box2_row1 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0))) #(Cima, Esquerda, Baixo, Direita)
+        self.wingspan_box2_row2 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0))) #(Cima, Esquerda, Baixo, Direita)
+        self.wingspan_box2_row3 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0))) #(Cima, Esquerda, Baixo, Direita)
+        self.wingspan_box2_row4 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0))) #(Cima, Esquerda, Baixo, Direita)
+        self.wingspan_box2_row5 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0))) #(Cima, Esquerda, Baixo, Direita)
+        self.wingspan_box2_row6 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0))) #(Cima, Esquerda, Baixo, Direita)
+        self.wingspan_box2_row7 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0))) #(Cima, Esquerda, Baixo, Direita)
+        self.wingspan_box2_row8 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0)))
+        self.wingspan_box2_row9 = toga.Box(style=Pack(direction=ROW, padding=(0, 0, 0, 0)))
+
+
+
+
+         # criar os itens para a tela
+        image0 = toga.Image("resources/players.png")
+        self.image_players = toga.ImageView(image=image0, style=Pack(width=70, height=70))
+        self.p1_name = toga.TextInput(placeholder='Jogador 1', style=Pack(font_size=20, flex=1))
+        self.p2_name = toga.TextInput(placeholder='Jogador 2', style=Pack(font_size=20, flex=1))
+
+
+        image1 = toga.Image("resources/p1.png")
+        self.image_p1 = toga.ImageView(image=image1, style=Pack(width=70, height=70)) #(Largura, Altura)
+        self.p1_ponto1 = toga.NumberInput(style=Pack(flex=1)) 
+        self.p2_ponto1 = toga.NumberInput(style=Pack(flex=1))
+
+
+        image2 = toga.Image("resources/p2.png")
+        self.image_p2 =toga.ImageView(image=image2, style=Pack(width=70, height=70))
+        self.p1_ponto2 = toga.NumberInput(style=Pack(flex=1))
+        self.p2_ponto2 = toga.NumberInput(style=Pack(flex=1))
+
+
+        image3 = toga.Image("resources/p3.png")
+        self.image_p3 = toga.ImageView(image3, style=Pack( width=70, height=70))
+        self.p1_ponto3 = toga.NumberInput(style=Pack(flex=1))
+        self.p2_ponto3 = toga.NumberInput(style=Pack(flex=1))
+
+
+        image4 = toga.Image("resources/p4.png")
+        self.image_p4 = toga.ImageView(image4, style=Pack(width=70, height=70))
+        self.p1_ponto4 = toga.NumberInput(style=Pack(flex=1))
+        self.p2_ponto4 = toga.NumberInput(style=Pack(flex=1))
+
+
+        image5 = toga.Image("resources/p5.png")
+        self.image_p5 = toga.ImageView(image5, style=Pack(width=70, height=70))
+        self.p1_ponto5 = toga.NumberInput(style=Pack(flex=1))
+        self.p2_ponto5 = toga.NumberInput(style=Pack(flex=1))
+
+
+        image6 = toga.Image("resources/p6.png")
+        self.image_p6 = toga.ImageView(image6, style=Pack(width=70, height=70))
+        self.p1_ponto6 = toga.NumberInput(style=Pack(flex=1))
+        self.p2_ponto6 = toga.NumberInput(style=Pack(flex=1))
+
+
+        
+        self.p1_total_label = toga.Label('0', style=Pack(flex=1, padding=(0, 0, 0, 70), font_size=20))
+        self.p2_total_label = toga.Label('0', style=Pack(flex=1, padding=(0, 0, 0, 70), font_size=20))
+        bnt_voltar = toga.Button('Voltar', on_press=self.quantidade_player)
+        bnt_soma = toga.Button('Somar', on_press=self.p2_somar)
+
+
+
+        
+         # adicionar os itens nas boxs 
+        self.wingspan_box2_row1.add(self.image_players) #imagem
+        self.wingspan_box2_row1.add(self.p1_name)
+        self.wingspan_box2_row1.add(self.p2_name)
+
+
+        self.wingspan_box2_row2.add(self.image_p1)      #imagem
+        self.wingspan_box2_row2.add(self.p1_ponto1)
+        self.wingspan_box2_row2.add(self.p2_ponto1)
+
+
+        self.wingspan_box2_row3.add(self.image_p2)      #imagem
+        self.wingspan_box2_row3.add(self.p1_ponto2)
+        self.wingspan_box2_row3.add(self.p2_ponto2)
+
+
+        self.wingspan_box2_row4.add(self.image_p3)      #imagem
+        self.wingspan_box2_row4.add(self.p1_ponto3)
+        self.wingspan_box2_row4.add(self.p2_ponto3)
+
+
+        self.wingspan_box2_row5.add(self.image_p4)      #imagem
+        self.wingspan_box2_row5.add(self.p1_ponto4)
+        self.wingspan_box2_row5.add(self.p2_ponto4)
+
+
+        self.wingspan_box2_row6.add(self.image_p5)      #image
+        self.wingspan_box2_row6.add(self.p1_ponto5)
+        self.wingspan_box2_row6.add(self.p2_ponto5)
+
+
+        self.wingspan_box2_row7.add(self.image_p6)      #image
+        self.wingspan_box2_row7.add(self.p1_ponto6)
+        self.wingspan_box2_row7.add(self.p2_ponto6)
+
+
+        self.wingspan_box2_row8.add(self.p1_total_label)
+        self.wingspan_box2_row8.add(self.p2_total_label)
+        self.wingspan_box2_row9.add(bnt_voltar)
+        self.wingspan_box2_row9.add(bnt_soma)
+
+
+
+         # colocar os intens um embaixo do outro /mostrar na tela
+        self.wingspan_box2.add(self.wingspan_box2_row1) #imagem de players
+        self.wingspan_box2.add(self.wingspan_box2_row1)
+
+
+        self.wingspan_box2.add(self.wingspan_box2_row2) #imagem de pontos 1
+        self.wingspan_box2.add(self.wingspan_box2_row2)
+
+        self.wingspan_box2.add(self.wingspan_box2_row3) #imagem de pontos 2
+        self.wingspan_box2.add(self.wingspan_box2_row3)
+
+        self.wingspan_box2.add(self.wingspan_box2_row4) #imagem de pontos 3
+        self.wingspan_box2.add(self.wingspan_box2_row4)
+
+        self.wingspan_box2.add(self.wingspan_box2_row5) #imagem de pontos 4
+        self.wingspan_box2.add(self.wingspan_box2_row5)
+        
+        self.wingspan_box2.add(self.wingspan_box2_row6) #imagem de pontos 5
+        self.wingspan_box2.add(self.wingspan_box2_row6)
+
+        self.wingspan_box2.add(self.wingspan_box2_row7) #imagem de pontos 6
+        self.wingspan_box2.add(self.wingspan_box2_row7)
+
+        self.wingspan_box2.add(self.wingspan_box2_row8)
+
+        self.wingspan_box2.add(self.wingspan_box2_row9)
+       
+       
+       
+        self.main_window.content = self.wingspan_box2
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+        #função que faz a contagem do score final
+    def p2_somar(self, widget):
+
+            #player 1
+        p1_p1 = int(self.p1_ponto1.value) if self.p1_ponto1.value else 0
+        p1_p2 = int(self.p1_ponto2.value) if self.p1_ponto2.value else 0
+        p1_p3 = int(self.p1_ponto3.value) if self.p1_ponto3.value else 0
+        p1_p4 = int(self.p1_ponto4.value) if self.p1_ponto4.value else 0
+        p1_p5 = int(self.p1_ponto5.value) if self.p1_ponto5.value else 0
+        p1_p6 = int(self.p1_ponto6.value) if self.p1_ponto6.value else 0
+        p1_soma = p1_p1 + p1_p2 + p1_p3 + p1_p4 + p1_p5 + p1_p6
+        self.p1_total_label.text = f'{p1_soma}'
+
+
+
+            #player 2
+        p2_p1 = int(self.p2_ponto1.value) if self.p2_ponto1.value else 0
+        p2_p2 = int(self.p2_ponto2.value) if self.p2_ponto2.value else 0
+        p2_p3 = int(self.p2_ponto3.value) if self.p2_ponto3.value else 0
+        p2_p4 = int(self.p2_ponto4.value) if self.p2_ponto4.value else 0
+        p2_p5 = int(self.p2_ponto5.value) if self.p2_ponto5.value else 0
+        p2_p6 = int(self.p2_ponto6.value) if self.p2_ponto6.value else 0
+        p2_soma = p2_p1 + p2_p2 + p2_p3 + p2_p4 + p2_p5 + p2_p6
+        self.p2_total_label.text = f'{p2_soma}'
+
+
+
+    def p1_somar(self, widget):
+
+            #player 1
+        p1_p1 = int(self.p1_ponto1.value) if self.p1_ponto1.value else 0
+        p1_p2 = int(self.p1_ponto2.value) if self.p1_ponto2.value else 0
+        p1_p3 = int(self.p1_ponto3.value) if self.p1_ponto3.value else 0
+        p1_p4 = int(self.p1_ponto4.value) if self.p1_ponto4.value else 0
+        p1_p5 = int(self.p1_ponto5.value) if self.p1_ponto5.value else 0
+        p1_p6 = int(self.p1_ponto6.value) if self.p1_ponto6.value else 0
+        p1_soma = p1_p1 + p1_p2 + p1_p3 + p1_p4 + p1_p5 + p1_p6
+        self.p1_total_label.text = f'{p1_soma}'
+
+
+    #          briefcase run android -d "@android" -u
+
+        #tela para a seleção do jogo
+    def boardgames(self, widget):
+        self.app_content = toga.Box(style=Pack(direction=COLUMN))
+            
+        self.app_content.add(toga.Label('BOARDGAMES', style=Pack(font_size=20, padding=(0))))
+            
+        self.app_content.add(toga.Button('Wingspan', on_press=self.quantidade_player))
+           
+        self.app_content.add(toga.Button('Voltar', on_press=self.voltar))
+            
+        self.main_window.content = self.app_content
+
+
+        #tela para criar um login no app
+    def registrar(self, widget):
+        self.registro = toga.Box(style=Pack(direction=COLUMN))
+
+        self.cadastro = toga.Label('Cadastro', style=Pack(font_size=20))
+        self.registro.add(self.cadastro)
+
+        self.username = toga.TextInput(placeholder='Nome de Usuário')
+        self.registro.add(self.username)
+
+        self.password = toga.PasswordInput(placeholder='Senha', style=Pack(padding=(10, 0, 0, 0))) #(Cima, Esquerda, Baixo, Direita) 
+        self.registro.add(self.password)
+        
+        self.try_password = toga.PasswordInput(placeholder='Confirmar Senha')
+        self.registro.add(self.try_password)
+
+        self.registro.add(toga.Button('Criar Cadastro', on_press=self.login))
+
+        self.registro.add(toga.Button('Voltar', on_press=self.voltar))
+
+        self.main_window.content = self.registro
+
+
+        #função que faz toda a verificação ao tentrar criar uma conta
+    def login(self, widget):
+        usuario_lower = self.username.value.lower()  # Convertendo para minúsculas
+        if usuario_lower in user:
+            self.main_window.info_dialog('Esse Nome de Usuário Já Existe', 'Tente Outro Nome de Usuário')
+        elif self.password.value != self.try_password.value:
+            self.main_window.info_dialog('Erro', 'As senhas não coincidem')
+        else:
+            user[usuario_lower] = self.password.value  # Salva no dicionário em minúsculas
+            salvar_login(usuario_lower, self.password.value)  # Salva no arquivo em minúsculas
+            self.main_window.info_dialog('Login Criado com Sucesso', 'Agora Você Ja Pode Fazer Login')
+            self.voltar(None)
+
+    
+        #função quer verifica se o login esta correto
+    def enviar(self, widget):
+        login = self.usuario.value.lower()  # Convertendo para minúsculas
+        senha = self.senha.value
+        if login in user and user[login] == senha:
+            salvar_login(login, senha)
+            self.main_window.info_dialog('Bem Vindo', 'Login efetuado com sucesso')
+            self.boardgames(None)
+        else:
+            self.main_window.info_dialog('ERRO', 'login ou senha incorretos')
+
+
+def main():
+    return app()
